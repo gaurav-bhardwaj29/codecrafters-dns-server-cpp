@@ -37,30 +37,51 @@ int main(){
             continue;
         }
         // BUILD DNS response header(12 bytes)
-        uint8_t response[12] = {};
+        uint8_t response[BUFFER_SIZE] = {};
+        ssize_t offset = 0;
 
         // Transaction ID: 1234 
-        response[0] = 0x04;
-        response[1] = 0xD2;
+        response[offset++] = 0x04;
+        response[offset++] = 0xD2;
 
-        response[2] = 0x80;
-        response[3] = 0x00;
+        response[offset++] = 0x80;
+        response[offset++] = 0x00;
         
-        response[4] = 0x00;
-        response[5] = 0x00;
+        response[offset++] = 0x00;
+        response[offset++] = 0x01;
 
-        response[6] = 0x00;
-        response[7] = 0x00;
+        response[offset++] = 0x00;
+        response[offset++] = 0x00;
 
-        response[8] = 0x00;
-        response[9] = 0x00;
+        response[offset++] = 0x00;
+        response[offset++] = 0x00;
 
-        response[10] = 0x00;
-        response[11] = 0x00;
+        response[offset++] = 0x00;
+        response[offset++] = 0x00;
 
-        sendto(sockfd, response, sizeof(response), 0, (struct sockaddr *)&client_addr, client_len);
+        const uint8_t qname[] = {
+            0x0c, 'c','o','d','e','c','r','a','f','t','e','r','s',
+            0x02, 'i','o',
+            0x00
+        };
+        memcpy(&response[offset], qname, sizeof(qname));
+        offset += sizeof(qname);
 
+        // Type: A (1)
+        response[offset++] = 0x00;
+        response[offset++] = 0x01;
+
+        // Class: IN (1)
+        response[offset++] = 0x00;
+        response[offset++] = 0x01;
+
+        // Send the response
+        sendto(sockfd, response, offset, 0,
+               (struct sockaddr *)&client_addr, client_len);
     }
+
     close(sockfd);
     return 0;
 }
+        
+
