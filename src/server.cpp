@@ -5,11 +5,11 @@
 #include <unistd.h>
 
 constexpr int PORT =2053;
-costexpr int BUFFER_SIZE =512;
+constexpr int BUFFER_SIZE =512;
 
 int main(){
     int sockfd;
-    struct sockaddr_in servr_addr{}, client_addr{};
+    struct sockaddr_in server_addr{}, client_addr{};
     socklen_t client_len = sizeof(client_addr);
     char buffer[BUFFER_SIZE];
 
@@ -25,7 +25,7 @@ int main(){
     server_addr.sin_addr.s_addr = INADDR_ANY;
     server_addr.sin_port = htons(PORT);
 
-    if (bind(sockfd, (const struct sockaddr *)&server_addr, sizeof(server_Addr)) <0){
+    if (bind(sockfd, (const struct sockaddr *)&server_addr, sizeof(server_addr)) <0){
         perror("bind failed");
         close(sockfd);
         return -1;
@@ -41,9 +41,9 @@ int main(){
 
         // Transaction ID: 1234 
         response[0] = 0x04;
-        response[1] = 0x00;
+        response[1] = 0xD2;
 
-        response[2] = 0x00;
+        response[2] = 0x80;
         response[3] = 0x00;
         
         response[4] = 0x00;
