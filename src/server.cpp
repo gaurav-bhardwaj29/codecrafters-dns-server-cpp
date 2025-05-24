@@ -13,14 +13,13 @@ int main() {
     socklen_t client_len = sizeof(client_addr);
     char buffer[BUFFER_SIZE];
 
-    // Create UDP socket
+    // UDP socket
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (sockfd < 0) {
         perror("socket creation failed");
         return 1;
     }
 
-    // Bind to port 2053
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = INADDR_ANY;
     server_addr.sin_port = htons(PORT);
@@ -39,36 +38,28 @@ int main() {
             continue;
         }
 
-        // Build DNS response header (12 bytes)
+        //DNS response header (12 bytes)
         uint8_t response[BUFFER_SIZE] = {};
         size_t offset = 0;
 
-        // Transaction ID: 1234 (0x04D2)
         response[offset++] = 0x04;
         response[offset++] = 0xD2;
 
-        // Flags: 0x8000 (QR=1, rest 0)
         response[offset++] = 0x80;
         response[offset++] = 0x00;
 
-        // QDCOUNT = 1
         response[offset++] = 0x00;
         response[offset++] = 0x01;
 
-        // ANCOUNT = 0
         response[offset++] = 0x00;
         response[offset++] = 0x00;
 
-        // NSCOUNT = 0
         response[offset++] = 0x00;
         response[offset++] = 0x00;
 
-        // ARCOUNT = 0
         response[offset++] = 0x00;
         response[offset++] = 0x00;
 
-        // Question Section
-        // Name: codecrafters.io => \x0ccodecrafters\x02io\x00
         const uint8_t qname[] = {
             0x0c, 'c','o','d','e','c','r','a','f','t','e','r','s',
             0x02, 'i','o',
@@ -77,15 +68,12 @@ int main() {
         memcpy(&response[offset], qname, sizeof(qname));
         offset += sizeof(qname);
 
-        // Type: A (1)
         response[offset++] = 0x00;
         response[offset++] = 0x01;
 
-        // Class: IN (1)
         response[offset++] = 0x00;
         response[offset++] = 0x01;
 
-        // Send the response
         sendto(sockfd, response, offset, 0,
                (struct sockaddr *)&client_addr, client_len);
     }
